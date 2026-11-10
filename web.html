@@ -1,0 +1,800 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXUS CODELABS — We Code The Future</title>
+  <meta name="description" content="NEXUS CODELABS is a premium web development agency building SaaS platforms, custom websites and high-performance web apps." />
+  <meta name="theme-color" content="#05060a" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Space Grotesk"', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            ink: '#05060a',
+            panel: '#0b0d14',
+            emerald: { 400: '#34d399', 500: '#10b981' },
+            amber: { 300: '#fcd34d', 400: '#fbbf24' },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --mx: 50vw;
+      --my: 30vh;
+      --emerald: 52, 211, 153;
+      --amber: 251, 191, 36;
+      --nav-h: 80px;
+    }
+    @media (max-width: 639px) { :root { --nav-h: 64px; } }
+
+    html, body { background: #05060a; }
+    body {
+      color: #e5e7eb;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: rgba(var(--emerald), .35); color: #fff; }
+
+    /* Anchor targets land below the fixed navbar */
+    section[id], main[id] { scroll-margin-top: var(--nav-h); }
+
+    /* ---------- Spotlight ---------- */
+    #spotlight {
+      position: fixed; inset: 0; pointer-events: none; z-index: 1;
+      background:
+        radial-gradient(600px circle at var(--mx) var(--my), rgba(var(--emerald), .09), transparent 45%),
+        radial-gradient(260px circle at var(--mx) var(--my), rgba(var(--amber), .06), transparent 60%);
+      transition: opacity .4s ease;
+    }
+    .grid-bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+    }
+    .grid-reveal {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(var(--emerald), .18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--emerald), .18) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(220px circle at var(--mx) var(--my), #000, transparent 100%);
+      -webkit-mask-image: radial-gradient(220px circle at var(--mx) var(--my), #000, transparent 100%);
+    }
+    .noise {
+      position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ---------- Hero split text ---------- */
+    .split-line { display: block; overflow: hidden; padding-bottom: .06em; }
+    .char {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(110%) rotate(8deg);
+      filter: blur(8px);
+      animation: charIn .9s cubic-bezier(.2,.8,.2,1) forwards;
+      animation-delay: calc(var(--i) * 45ms + 200ms);
+    }
+    @keyframes charIn {
+      to { opacity: 1; transform: translateY(0) rotate(0); filter: blur(0); }
+    }
+    .text-gradient {
+      background: linear-gradient(100deg, #34d399 0%, #a7f3d0 35%, #fcd34d 70%, #fbbf24 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: shine 6s linear infinite;
+    }
+    .text-gradient .char { -webkit-text-fill-color: transparent; background: inherit; -webkit-background-clip: text; background-clip: text; }
+    @keyframes shine { to { background-position: 200% center; } }
+
+    .type-caret {
+      display: inline-block; width: 2px; height: 1.1em; margin-left: 4px;
+      background: #34d399; vertical-align: -0.15em;
+      animation: blink 1s steps(1) infinite;
+      box-shadow: 0 0 10px #34d399;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    #typed { transition: opacity .35s ease, filter .35s ease; }
+    #typed.fading { opacity: 0; filter: blur(6px); }
+
+    .fade-up { opacity: 0; transform: translateY(24px); animation: fadeUp 1s cubic-bezier(.2,.8,.2,1) forwards; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* ---------- Scroll indicator ---------- */
+    .scroll-indicator {
+      margin-top: 25px;
+      padding-top: 25px;
+    }
+    @media (max-height: 760px) { .scroll-indicator { display: none !important; } }
+
+    /* ---------- Neon button ---------- */
+    .btn-neon {
+      position: relative; isolation: isolate;
+      background: linear-gradient(135deg, #10b981, #34d399);
+      color: #031b12;
+      box-shadow: 0 0 0 1px rgba(var(--emerald), .6), 0 0 24px rgba(var(--emerald), .45), 0 0 64px rgba(var(--emerald), .25), inset 0 1px 0 rgba(255,255,255,.4);
+      transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease;
+    }
+    .btn-neon::before {
+      content: ''; position: absolute; inset: -2px; z-index: -1; border-radius: inherit;
+      background: conic-gradient(from var(--angle, 0deg), #34d399, #fbbf24, #34d399);
+      filter: blur(14px); opacity: .55;
+      animation: spin 4s linear infinite;
+    }
+    .btn-neon:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 0 0 1px rgba(var(--emerald), .9), 0 0 36px rgba(var(--emerald), .7), 0 0 96px rgba(var(--emerald), .35), inset 0 1px 0 rgba(255,255,255,.5);
+    }
+    @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+    @keyframes spin { to { --angle: 360deg; } }
+
+    .btn-ghost {
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      backdrop-filter: blur(10px);
+      transition: border-color .3s, background .3s, transform .3s;
+    }
+    .btn-ghost:hover { border-color: rgba(var(--amber), .5); background: rgba(var(--amber), .06); transform: translateY(-2px); }
+
+    /* ---------- Glass shapes ---------- */
+    .glass {
+      background: linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.015));
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      box-shadow: 0 30px 80px -20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .float-a { animation: floatA 9s ease-in-out infinite; }
+    .float-b { animation: floatB 11s ease-in-out infinite; }
+    .float-c { animation: floatC 13s ease-in-out infinite; }
+    @keyframes floatA { 0%,100% { transform: translate3d(0,0,0) rotate(-12deg); } 50% { transform: translate3d(0,-28px,0) rotate(-4deg); } }
+    @keyframes floatB { 0%,100% { transform: translate3d(0,0,0) rotate(18deg); } 50% { transform: translate3d(-18px,22px,0) rotate(28deg); } }
+    @keyframes floatC { 0%,100% { transform: translate3d(0,0,0) rotate(0); } 50% { transform: translate3d(14px,-18px,0) rotate(-10deg); } }
+    .parallax { transition: transform .6s cubic-bezier(.2,.8,.2,1); will-change: transform; }
+
+    .orb { position: absolute; border-radius: 9999px; filter: blur(90px); opacity: .45; pointer-events: none; }
+
+    /* ---------- Scroll reveal ---------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px) scale(.94);
+      filter: blur(6px);
+      transition: opacity 1s cubic-bezier(.2,.8,.2,1), transform 1s cubic-bezier(.2,.8,.2,1), filter 1s ease;
+      transition-delay: var(--d, 0ms);
+    }
+    .reveal.in { opacity: 1; transform: none; filter: blur(0); }
+
+    /* ---------- Feature cards w/ border glow ---------- */
+    .card {
+      --cx: 50%; --cy: 50%;
+      --glow: var(--emerald);
+      position: relative; border-radius: 1.5rem;
+      background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.01));
+      border: 1px solid rgba(255,255,255,.07);
+      transition: transform .5s cubic-bezier(.2,.8,.2,1), border-color .4s, box-shadow .5s;
+      isolation: isolate;
+    }
+    .card.amber { --glow: var(--amber); }
+    .card::before {
+      content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; z-index: -1;
+      background: radial-gradient(380px circle at var(--cx) var(--cy), rgba(var(--glow), .9), transparent 45%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0; transition: opacity .4s ease;
+    }
+    .card::after {
+      content: ''; position: absolute; inset: 0; border-radius: inherit; z-index: -1; pointer-events: none;
+      background: radial-gradient(500px circle at var(--cx) var(--cy), rgba(var(--glow), .10), transparent 40%);
+      opacity: 0; transition: opacity .4s ease;
+    }
+    .card:hover::before, .card:hover::after { opacity: 1; }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 30px 80px -30px rgba(var(--glow), .45), 0 0 0 1px rgba(var(--glow), .15);
+    }
+    .card .icon-wrap {
+      background: rgba(var(--glow), .08);
+      border: 1px solid rgba(var(--glow), .25);
+      color: rgb(var(--glow));
+      box-shadow: 0 0 0 rgba(var(--glow), 0);
+      transition: box-shadow .4s, transform .4s;
+    }
+    .card:hover .icon-wrap { box-shadow: 0 0 30px rgba(var(--glow), .45); transform: scale(1.08) rotate(-4deg); }
+    .card .arrow { transition: transform .4s cubic-bezier(.2,.8,.2,1); }
+    .card:hover .arrow { transform: translateX(6px); color: rgb(var(--glow)); }
+    .card .tag { border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.02); }
+
+    /* ---------- Marquee ---------- */
+    .marquee { mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+    .marquee-track { animation: marquee 32s linear infinite; }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+
+    /* ---------- Contact floating underline inputs ---------- */
+    .field { position: relative; padding-top: 1.35rem; }
+    .field input, .field textarea {
+      width: 100%; background: transparent; border: 0; outline: 0;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      padding: .55rem 0 .7rem; color: #f3f4f6; font-size: 1rem;
+      resize: none; border-radius: 0;
+    }
+    .field label {
+      position: absolute; left: 0; top: 1.9rem;
+      color: #6b7280; font-size: 1rem; pointer-events: none;
+      transform-origin: left top;
+      transition: transform .35s cubic-bezier(.2,.8,.2,1), color .35s;
+    }
+    .field .line {
+      position: absolute; left: 0; bottom: 0; height: 2px; width: 100%;
+      background: linear-gradient(90deg, #34d399, #fbbf24);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .55s cubic-bezier(.2,.8,.2,1);
+      box-shadow: 0 0 12px rgba(var(--emerald), .6);
+    }
+    .field textarea ~ .line { bottom: 6px; }
+    .field input:focus ~ label, .field input:not(:placeholder-shown) ~ label,
+    .field textarea:focus ~ label, .field textarea:not(:placeholder-shown) ~ label {
+      transform: translateY(-1.55rem) scale(.78); color: #34d399;
+    }
+    .field input:focus ~ .line, .field textarea:focus ~ .line { transform: scaleX(1); }
+
+    .chip input { display: none; }
+    .chip span { border: 1px solid rgba(255,255,255,.1); transition: all .3s; cursor: pointer; }
+    .chip span:hover { border-color: rgba(255,255,255,.25); }
+    .chip input:checked + span { border-color: rgba(var(--emerald), .7); background: rgba(var(--emerald), .1); color: #a7f3d0; box-shadow: 0 0 18px rgba(var(--emerald), .25); }
+
+    /* ---------- Nav ---------- */
+    #nav { transition: background .4s, border-color .4s, padding .4s; }
+    #nav.scrolled { background: rgba(5,6,10,.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-color: rgba(255,255,255,.07); }
+    .nav-link { position: relative; }
+    .nav-link::after { content: ''; position: absolute; left: 0; bottom: -4px; height: 1px; width: 100%; background: #34d399; transform: scaleX(0); transform-origin: right; transition: transform .4s cubic-bezier(.2,.8,.2,1); }
+    .nav-link:hover::after, .nav-link.active::after { transform: scaleX(1); transform-origin: left; }
+    .nav-link.active { color: #fff; }
+
+    .pulse-dot { box-shadow: 0 0 0 0 rgba(var(--emerald), .7); animation: pulse 2s infinite; }
+    @keyframes pulse { 70% { box-shadow: 0 0 0 10px rgba(var(--emerald), 0); } 100% { box-shadow: 0 0 0 0 rgba(var(--emerald), 0); } }
+
+    #progress { transform-origin: left; transform: scaleX(0); }
+
+    @media (hover: none) { #spotlight, .grid-reveal { opacity: .6; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+      .reveal, .char, .fade-up { opacity: 1 !important; transform: none !important; filter: none !important; }
+    }
+  </style>
+</head>
+
+<body class="relative">
+  <!-- Ambient layers -->
+  <div class="grid-bg" aria-hidden="true"></div>
+  <div class="grid-reveal" aria-hidden="true"></div>
+  <div id="spotlight" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+  <div id="progress" class="fixed top-0 left-0 right-0 h-[2px] z-[60] bg-gradient-to-r from-emerald-400 via-emerald-300 to-amber-400"></div>
+
+  <!-- ================= NAV ================= -->
+  <header id="nav" class="fixed top-0 inset-x-0 z-50 border-b border-transparent">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+      <a href="#top" class="flex items-center gap-2.5 group" aria-label="NEXUS CODELABS home">
+        <span class="relative grid place-items-center w-9 h-9 rounded-xl glass">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="url(#lg)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#fbbf24"/></linearGradient></defs>
+            <path d="M5 19V5l14 14V5"/>
+          </svg>
+        </span>
+        <span class="font-display font-bold tracking-tight text-white">NEXUS<span class="text-gray-500 font-medium"> CODELABS</span></span>
+      </a>
+
+      <ul class="hidden md:flex items-center gap-9 text-sm text-gray-400">
+        <li><a class="nav-link hover:text-white transition" href="#services">Services</a></li>
+        <li><a class="nav-link hover:text-white transition" href="#process">Process</a></li>
+        <li><a class="nav-link hover:text-white transition" href="#results">Results</a></li>
+        <li><a class="nav-link hover:text-white transition" href="#contact">Contact</a></li>
+      </ul>
+
+      <div class="flex items-center gap-3">
+        <a href="#contact" class="hidden sm:inline-flex btn-ghost rounded-full px-5 py-2.5 text-sm font-medium text-white">Book a call</a>
+        <button id="menuBtn" class="md:hidden w-10 h-10 grid place-items-center rounded-xl glass" aria-label="Open menu" aria-expanded="false">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h10"/></svg>
+        </button>
+      </div>
+    </nav>
+    <div id="mobileMenu" class="md:hidden hidden px-4 pb-6">
+      <div class="glass rounded-2xl p-4 flex flex-col gap-1 text-gray-300">
+        <a href="#services" class="px-3 py-3 rounded-lg hover:bg-white/5">Services</a>
+        <a href="#process" class="px-3 py-3 rounded-lg hover:bg-white/5">Process</a>
+        <a href="#results" class="px-3 py-3 rounded-lg hover:bg-white/5">Results</a>
+        <a href="#contact" class="px-3 py-3 rounded-lg hover:bg-white/5">Contact</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="relative z-10">
+    <!-- ================= HERO ================= -->
+    <section id="hero" class="relative min-h-[100svh] flex items-center pt-28 pb-40 overflow-hidden">
+      <div class="orb w-[520px] h-[520px] bg-emerald-500/40 -top-40 -left-40"></div>
+      <div class="orb w-[420px] h-[420px] bg-amber-400/25 top-1/3 -right-40"></div>
+
+      <!-- Floating glass geometry -->
+      <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div class="parallax absolute top-[18%] right-[8%] hidden sm:block" data-depth="30">
+          <div class="float-a glass w-40 h-40 lg:w-56 lg:h-56 rounded-[2.5rem] relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-emerald-400/25 to-transparent"></div>
+            <div class="absolute bottom-5 left-5 right-5 space-y-2">
+              <div class="h-1.5 w-2/3 rounded-full bg-emerald-300/50"></div>
+              <div class="h-1.5 w-1/2 rounded-full bg-white/20"></div>
+              <div class="h-1.5 w-3/4 rounded-full bg-white/10"></div>
+            </div>
+          </div>
+        </div>
+        <div class="parallax absolute bottom-[14%] right-[26%] hidden md:block" data-depth="-20">
+          <div class="float-b glass w-24 h-24 lg:w-28 lg:h-28 rounded-full relative">
+            <div class="absolute inset-3 rounded-full border border-amber-300/40"></div>
+            <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-400/30 to-transparent"></div>
+          </div>
+        </div>
+        <div class="parallax absolute top-[24%] left-[52%] hidden lg:block" data-depth="15">
+          <div class="float-c glass w-16 h-16 rounded-2xl rotate-45 bg-gradient-to-br from-white/10 to-transparent"></div>
+        </div>
+        <div class="parallax absolute bottom-[22%] left-[4%] hidden lg:block" data-depth="-25">
+          <div class="float-b glass rounded-2xl px-4 py-3 font-mono text-[11px] text-emerald-300/90 leading-5">
+            <span class="text-gray-500">const</span> future = <span class="text-amber-300">await</span> nexus.build();<br/>
+            <span class="text-gray-500">// ✓ deployed in 42ms</span>
+          </div>
+        </div>
+        <div class="parallax absolute top-[62%] right-[6%] hidden lg:block" data-depth="22">
+          <div class="float-c glass rounded-2xl p-4 w-52">
+            <div class="flex items-center justify-between text-[11px] text-gray-400 mb-2"><span>Lighthouse</span><span class="text-emerald-300">100</span></div>
+            <div class="h-1.5 rounded-full bg-white/10 overflow-hidden"><div class="h-full w-full bg-gradient-to-r from-emerald-400 to-amber-300"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div class="fade-up inline-flex items-center gap-2.5 glass rounded-full pl-2 pr-4 py-1.5 text-xs sm:text-sm text-gray-300 mb-8" style="animation-delay:.1s">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot ml-1"></span>
+          Now booking Q1 2027 projects — 3 slots left
+        </div>
+
+        <h1 class="font-display font-bold tracking-[-0.04em] leading-[0.92] text-[clamp(3rem,11vw,9.5rem)] text-white">
+          <span class="split-line" data-split>WE CODE</span>
+          <span class="split-line"><span class="text-gradient" data-split>THE FUTURE</span><span class="text-emerald-400" data-split>.</span></span>
+        </h1>
+
+        <p class="fade-up mt-8 max-w-xl text-lg sm:text-xl text-gray-400 leading-relaxed" style="animation-delay:1.1s">
+          A senior engineering studio crafting
+          <span class="text-white font-medium whitespace-nowrap"><span id="typed">SaaS platforms</span><span class="type-caret"></span></span>
+          <br class="hidden sm:block" />that load instantly, scale effortlessly and convert relentlessly.
+        </p>
+
+        <div class="fade-up mt-10 flex flex-col sm:flex-row gap-4" style="animation-delay:1.3s">
+          <a href="#contact" class="btn-neon rounded-full px-8 py-4 font-semibold inline-flex items-center justify-center gap-2.5 magnetic">
+            Start your project
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="#services" class="btn-ghost rounded-full px-8 py-4 font-medium text-white inline-flex items-center justify-center gap-2.5">
+            Explore services
+          </a>
+        </div>
+
+        <div class="fade-up mt-16 flex flex-wrap items-center gap-x-10 gap-y-4 text-sm text-gray-500" style="animation-delay:1.5s">
+          <div class="flex -space-x-2">
+            <span class="w-8 h-8 rounded-full border-2 border-ink bg-gradient-to-br from-emerald-300 to-emerald-600"></span>
+            <span class="w-8 h-8 rounded-full border-2 border-ink bg-gradient-to-br from-amber-200 to-amber-500"></span>
+            <span class="w-8 h-8 rounded-full border-2 border-ink bg-gradient-to-br from-gray-300 to-gray-600"></span>
+            <span class="w-8 h-8 rounded-full border-2 border-ink bg-panel grid place-items-center text-[10px] text-white">+80</span>
+          </div>
+          <span><span class="text-white font-medium">★ 4.9/5</span> from 80+ founders &amp; product teams</span>
+        </div>
+      </div>
+
+      <a href="#services" class="scroll-indicator absolute bottom-4 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 text-[11px] tracking-[.3em] text-gray-500 uppercase hover:text-emerald-400 transition" aria-label="Scroll down">
+        Scroll
+        <span class="w-px h-10 bg-gradient-to-b from-emerald-400 to-transparent"></span>
+      </a>
+    </section>
+
+    <!-- ================= MARQUEE ================= -->
+    <section class="relative py-10 border-y border-white/5 bg-white/[0.01]">
+      <div class="marquee overflow-hidden">
+        <div class="marquee-track flex w-max gap-16 font-display text-2xl sm:text-3xl font-semibold text-gray-600 whitespace-nowrap">
+          <span>Next.js</span><span class="text-emerald-400/60">✦</span><span>React</span><span class="text-amber-300/60">✦</span><span>TypeScript</span><span class="text-emerald-400/60">✦</span><span>Node</span><span class="text-amber-300/60">✦</span><span>PostgreSQL</span><span class="text-emerald-400/60">✦</span><span>Stripe</span><span class="text-amber-300/60">✦</span><span>AWS</span><span class="text-emerald-400/60">✦</span><span>WebGL</span><span class="text-amber-300/60">✦</span>
+          <span>Next.js</span><span class="text-emerald-400/60">✦</span><span>React</span><span class="text-amber-300/60">✦</span><span>TypeScript</span><span class="text-emerald-400/60">✦</span><span>Node</span><span class="text-amber-300/60">✦</span><span>PostgreSQL</span><span class="text-emerald-400/60">✦</span><span>Stripe</span><span class="text-amber-300/60">✦</span><span>AWS</span><span class="text-emerald-400/60">✦</span><span>WebGL</span><span class="text-amber-300/60">✦</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SERVICES ================= -->
+    <section id="services" class="relative py-28 sm:py-36">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl">
+          <p class="reveal font-mono text-xs tracking-[.3em] uppercase text-emerald-400">// 01 — Services</p>
+          <h2 class="reveal font-display text-4xl sm:text-6xl font-bold tracking-tight text-white mt-5 leading-[1.02]" style="--d:100ms">
+            Engineered for growth.<br/><span class="text-gray-500">Designed to be remembered.</span>
+          </h2>
+        </div>
+
+        <div class="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3" id="cards">
+          <!-- SaaS -->
+          <article class="card reveal p-8 sm:p-10 flex flex-col" style="--d:0ms">
+            <div class="icon-wrap w-14 h-14 rounded-2xl grid place-items-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+            </div>
+            <h3 class="font-display text-2xl font-semibold text-white mt-8">SaaS Platforms</h3>
+            <p class="text-gray-400 mt-3 leading-relaxed flex-1">Multi-tenant architecture, subscription billing, role-based auth and analytics dashboards — built to go from MVP to Series A without a rewrite.</p>
+            <div class="flex flex-wrap gap-2 mt-6 text-xs text-gray-400">
+              <span class="tag rounded-full px-3 py-1">Billing</span><span class="tag rounded-full px-3 py-1">Auth</span><span class="tag rounded-full px-3 py-1">Dashboards</span>
+            </div>
+            <a href="#contact" class="mt-8 inline-flex items-center gap-2 text-sm font-medium text-white">Launch your SaaS <span class="arrow">→</span></a>
+          </article>
+
+          <!-- Custom Sites -->
+          <article class="card amber reveal p-8 sm:p-10 flex flex-col" style="--d:120ms">
+            <div class="icon-wrap w-14 h-14 rounded-2xl grid place-items-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.12a3 3 0 00-5.78 1.13 2.25 2.25 0 01-2.4 2.25 4.5 4.5 0 008.4-2.25c0-.4-.08-.78-.22-1.130zm0 0a15.99 15.99 0 003.39-1.62m-5.04-.03a15.99 15.99 0 011.62-3.4m3.42 3.43a15.99 15.99 0 004.76-4.65l3.88-5.82a1.15 1.15 0 00-1.6-1.6l-5.81 3.88a15.99 15.99 0 00-4.65 4.76m3.42 3.42a6.78 6.78 0 00-3.42-3.42"/></svg>
+            </div>
+            <h3 class="font-display text-2xl font-semibold text-white mt-8">Custom Websites</h3>
+            <p class="text-gray-400 mt-3 leading-relaxed flex-1">Award-calibre marketing sites with cinematic motion, headless CMS and perfect Core Web Vitals — so your brand feels as premium as your product.</p>
+            <div class="flex flex-wrap gap-2 mt-6 text-xs text-gray-400">
+              <span class="tag rounded-full px-3 py-1">Motion</span><span class="tag rounded-full px-3 py-1">CMS</span><span class="tag rounded-full px-3 py-1">SEO</span>
+            </div>
+            <a href="#contact" class="mt-8 inline-flex items-center gap-2 text-sm font-medium text-white">Design your site <span class="arrow">→</span></a>
+          </article>
+
+          <!-- Web Apps -->
+          <article class="card reveal p-8 sm:p-10 flex flex-col md:col-span-2 lg:col-span-1" style="--d:240ms">
+            <div class="icon-wrap w-14 h-14 rounded-2xl grid place-items-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/></svg>
+            </div>
+            <h3 class="font-display text-2xl font-semibold text-white mt-8">Web Applications</h3>
+            <p class="text-gray-400 mt-3 leading-relaxed flex-1">Real-time collaboration, complex workflows, AI integrations and internal tools — robust TypeScript codebases your team will love to maintain.</p>
+            <div class="flex flex-wrap gap-2 mt-6 text-xs text-gray-400">
+              <span class="tag rounded-full px-3 py-1">Real-time</span><span class="tag rounded-full px-3 py-1">AI</span><span class="tag rounded-full px-3 py-1">APIs</span>
+            </div>
+            <a href="#contact" class="mt-8 inline-flex items-center gap-2 text-sm font-medium text-white">Build your app <span class="arrow">→</span></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PROCESS ================= -->
+    <section id="process" class="relative py-28 sm:py-36 border-t border-white/5">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-14">
+        <div class="lg:col-span-5 lg:sticky lg:top-32 self-start">
+          <p class="reveal font-mono text-xs tracking-[.3em] uppercase text-amber-300">// 02 — Process</p>
+          <h2 class="reveal font-display text-4xl sm:text-5xl font-bold tracking-tight text-white mt-5 leading-[1.05]" style="--d:100ms">From idea to launch in <span class="text-gradient">weeks</span>, not quarters.</h2>
+          <p class="reveal text-gray-400 mt-6 text-lg leading-relaxed" style="--d:200ms">A tight, transparent sprint system with weekly demos, a shared roadmap and zero surprises.</p>
+        </div>
+        <div class="lg:col-span-7 space-y-5">
+          <div class="card reveal p-7 sm:p-8 flex gap-6" style="--d:0ms">
+            <span class="font-mono text-emerald-400 text-sm pt-1">01</span>
+            <div><h3 class="font-display text-xl font-semibold text-white">Discover</h3><p class="text-gray-400 mt-2">Workshops, user research and technical scoping to define what success looks like.</p></div>
+          </div>
+          <div class="card amber reveal p-7 sm:p-8 flex gap-6" style="--d:80ms">
+            <span class="font-mono text-amber-300 text-sm pt-1">02</span>
+            <div><h3 class="font-display text-xl font-semibold text-white">Design</h3><p class="text-gray-400 mt-2">High-fidelity prototypes and a scalable design system, validated before a line of code ships.</p></div>
+          </div>
+          <div class="card reveal p-7 sm:p-8 flex gap-6" style="--d:160ms">
+            <span class="font-mono text-emerald-400 text-sm pt-1">03</span>
+            <div><h3 class="font-display text-xl font-semibold text-white">Develop</h3><p class="text-gray-400 mt-2">Two-week sprints, CI/CD from day one, automated tests and staging previews on every PR.</p></div>
+          </div>
+          <div class="card amber reveal p-7 sm:p-8 flex gap-6" style="--d:240ms">
+            <span class="font-mono text-amber-300 text-sm pt-1">04</span>
+            <div><h3 class="font-display text-xl font-semibold text-white">Deploy &amp; Scale</h3><p class="text-gray-400 mt-2">Launch, monitor, iterate. Ongoing partnership with performance and conversion optimisation.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= RESULTS ================= -->
+    <section id="results" class="relative py-28 sm:py-32 border-t border-white/5">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <p class="reveal font-mono text-xs tracking-[.3em] uppercase text-emerald-400 text-center">// 03 — Results</p>
+        <h2 class="reveal font-display text-4xl sm:text-5xl font-bold tracking-tight text-white mt-5 text-center" style="--d:100ms">Numbers that speak for themselves.</h2>
+        <div class="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/5 rounded-3xl overflow-hidden border border-white/5">
+          <div class="reveal bg-ink p-8 sm:p-10 text-center" style="--d:0ms">
+            <div class="font-display text-4xl sm:text-6xl font-bold text-white"><span class="count" data-to="120">0</span>+</div>
+            <p class="text-gray-500 text-sm mt-3">Products shipped</p>
+          </div>
+          <div class="reveal bg-ink p-8 sm:p-10 text-center" style="--d:100ms">
+            <div class="font-display text-4xl sm:text-6xl font-bold text-gradient"><span class="count" data-to="98">0</span>%</div>
+            <p class="text-gray-500 text-sm mt-3">Client retention</p>
+          </div>
+          <div class="reveal bg-ink p-8 sm:p-10 text-center" style="--d:200ms">
+            <div class="font-display text-4xl sm:text-6xl font-bold text-white">$<span class="count" data-to="340">0</span>M</div>
+            <p class="text-gray-500 text-sm mt-3">Raised by our clients</p>
+          </div>
+          <div class="reveal bg-ink p-8 sm:p-10 text-center" style="--d:300ms">
+            <div class="font-display text-4xl sm:text-6xl font-bold text-white"><span class="count" data-to="3">0</span>x</div>
+            <p class="text-gray-500 text-sm mt-3">Avg. conversion lift</p>
+          </div>
+        </div>
+
+        <figure class="reveal mt-20 max-w-3xl mx-auto text-center" style="--d:100ms">
+          <blockquote class="font-display text-2xl sm:text-3xl text-white leading-snug">“NEXUS rebuilt our platform in 9 weeks. Load times dropped 70% and trial-to-paid conversion doubled the month after launch.”</blockquote>
+          <figcaption class="mt-6 text-gray-500 text-sm">Head of Product — B2B Analytics SaaS</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ================= CONTACT ================= -->
+    <section id="contact" class="relative py-28 sm:py-36 border-t border-white/5 overflow-hidden">
+      <div class="orb w-[500px] h-[500px] bg-emerald-500/20 left-1/2 -translate-x-1/2 top-20"></div>
+      <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-14 items-start">
+        <div>
+          <p class="reveal font-mono text-xs tracking-[.3em] uppercase text-amber-300">// 04 — Contact</p>
+          <h2 class="reveal font-display text-4xl sm:text-6xl font-bold tracking-tight text-white mt-5 leading-[1.02]" style="--d:100ms">Let’s build something <span class="text-gradient">extraordinary.</span></h2>
+          <p class="reveal text-gray-400 mt-6 text-lg leading-relaxed max-w-md" style="--d:200ms">Tell us about your project. We reply within 24 hours with next steps and a free technical assessment.</p>
+          <div class="reveal mt-10 space-y-4 text-gray-300" style="--d:300ms">
+            <a href="mailto:hello@nexuscodelabs.com" class="flex items-center gap-4 group w-fit">
+              <span class="w-11 h-11 rounded-xl glass grid place-items-center text-emerald-400 group-hover:shadow-[0_0_24px_rgba(52,211,153,.4)] transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+              </span>
+              hello@nexuscodelabs.com
+            </a>
+            <div class="flex items-center gap-4">
+              <span class="w-11 h-11 rounded-xl glass grid place-items-center text-amber-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </span>
+              Avg. response time: under 4 hours
+            </div>
+          </div>
+        </div>
+
+        <form id="contactForm" class="reveal glass rounded-[2rem] p-7 sm:p-10" style="--d:150ms" novalidate>
+          <div class="grid sm:grid-cols-2 gap-x-8 gap-y-6">
+            <div class="field">
+              <input id="name" name="name" type="text" placeholder=" " required autocomplete="name" />
+              <label for="name">Your name</label><span class="line"></span>
+            </div>
+            <div class="field">
+              <input id="email" name="email" type="email" placeholder=" " required autocomplete="email" />
+              <label for="email">Email address</label><span class="line"></span>
+            </div>
+            <div class="field sm:col-span-2">
+              <input id="company" name="company" type="text" placeholder=" " autocomplete="organization" />
+              <label for="company">Company (optional)</label><span class="line"></span>
+            </div>
+          </div>
+
+          <fieldset class="mt-8">
+            <legend class="text-sm text-gray-500 mb-3">I’m interested in</legend>
+            <div class="flex flex-wrap gap-2 text-sm text-gray-300">
+              <label class="chip"><input type="checkbox" name="service" value="saas" checked /><span class="inline-block rounded-full px-4 py-2">SaaS</span></label>
+              <label class="chip"><input type="checkbox" name="service" value="site" /><span class="inline-block rounded-full px-4 py-2">Custom Site</span></label>
+              <label class="chip"><input type="checkbox" name="service" value="app" /><span class="inline-block rounded-full px-4 py-2">Web App</span></label>
+              <label class="chip"><input type="checkbox" name="service" value="other" /><span class="inline-block rounded-full px-4 py-2">Other</span></label>
+            </div>
+          </fieldset>
+
+          <div class="field mt-6">
+            <textarea id="message" name="message" rows="4" placeholder=" " required></textarea>
+            <label for="message">Tell us about your project</label><span class="line"></span>
+          </div>
+
+          <button type="submit" class="btn-neon w-full mt-8 rounded-full px-8 py-4 font-semibold inline-flex items-center justify-center gap-2.5">
+            <span id="submitText">Send message</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.27 3.13A59.77 59.77 0 0121.49 12 59.77 59.77 0 013.27 20.88L6 12zm0 0h7.5"/></svg>
+          </button>
+          <p id="formStatus" class="text-sm text-center mt-4 min-h-[1.25rem] text-gray-500" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="relative z-10 border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-gray-500">
+      <span class="font-display font-bold text-white">NEXUS<span class="text-gray-500 font-medium"> CODELABS</span></span>
+      <span>© <span id="year"></span> NEXUS CODELABS. Crafted with obsession.</span>
+      <div class="flex gap-6">
+        <a href="#" class="hover:text-emerald-400 transition">GitHub</a>
+        <a href="#" class="hover:text-emerald-400 transition">LinkedIn</a>
+        <a href="#" class="hover:text-emerald-400 transition">Dribbble</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* ---------- Split text into animated chars ---------- */
+      let idx = 0;
+      document.querySelectorAll('[data-split]').forEach(el => {
+        const text = el.textContent;
+        el.textContent = '';
+        el.setAttribute('aria-label', text);
+        [...text].forEach(ch => {
+          const s = document.createElement('span');
+          s.className = 'char';
+          s.setAttribute('aria-hidden', 'true');
+          s.style.setProperty('--i', idx++);
+          s.innerHTML = ch === ' ' ? '&nbsp;' : ch;
+          el.appendChild(s);
+        });
+      });
+
+      /* ---------- Smooth spotlight (lerped) ---------- */
+      let tx = innerWidth / 2, ty = innerHeight * .3, cx = tx, cy = ty;
+      const onMove = (x, y) => { tx = x; ty = y; };
+      addEventListener('pointermove', e => onMove(e.clientX, e.clientY), { passive: true });
+      addEventListener('touchmove', e => { const t = e.touches[0]; if (t) onMove(t.clientX, t.clientY); }, { passive: true });
+
+      const parallaxEls = document.querySelectorAll('.parallax');
+      const tick = () => {
+        cx += (tx - cx) * .12;
+        cy += (ty - cy) * .12;
+        root.style.setProperty('--mx', cx + 'px');
+        root.style.setProperty('--my', cy + 'px');
+        if (!reduce) {
+          const nx = (cx / innerWidth - .5), ny = (cy / innerHeight - .5);
+          parallaxEls.forEach(el => {
+            const d = +el.dataset.depth || 0;
+            el.style.transform = `translate3d(${nx * d}px, ${ny * d}px, 0)`;
+          });
+        }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+
+      /* ---------- Typing / fading rotator ---------- */
+      const words = ['SaaS platforms', 'custom websites', 'web applications', 'digital products'];
+      const typed = document.getElementById('typed');
+      let w = 0;
+      const sleep = ms => new Promise(r => setTimeout(r, ms));
+      const typeLoop = async () => {
+        await sleep(2600);
+        while (true) {
+          const cur = words[w];
+          for (let i = cur.length; i >= 0; i--) { typed.textContent = cur.slice(0, i); await sleep(28); }
+          w = (w + 1) % words.length;
+          const next = words[w];
+          for (let i = 1; i <= next.length; i++) { typed.textContent = next.slice(0, i); await sleep(55 + Math.random() * 40); }
+          await sleep(2200);
+          typed.classList.add('fading'); await sleep(350);
+          typed.classList.remove('fading');
+        }
+      };
+      if (!reduce) typeLoop();
+
+      /* ---------- Scroll reveal (fade + scale) ---------- */
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(en => {
+          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+        });
+      }, { threshold: .15, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+      /* ---------- Card border glow tracking ---------- */
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('pointermove', e => {
+          const r = card.getBoundingClientRect();
+          card.style.setProperty('--cx', (e.clientX - r.left) + 'px');
+          card.style.setProperty('--cy', (e.clientY - r.top) + 'px');
+        });
+      });
+
+      /* ---------- Magnetic CTA ---------- */
+      if (!reduce && matchMedia('(hover: hover)').matches) {
+        document.querySelectorAll('.magnetic').forEach(btn => {
+          btn.addEventListener('pointermove', e => {
+            const r = btn.getBoundingClientRect();
+            const x = e.clientX - r.left - r.width / 2, y = e.clientY - r.top - r.height / 2;
+            btn.style.transform = `translate(${x * .18}px, ${y * .3}px) scale(1.03)`;
+          });
+          btn.addEventListener('pointerleave', () => btn.style.transform = '');
+        });
+      }
+
+      /* ---------- Counters ---------- */
+      const cio = new IntersectionObserver(entries => {
+        entries.forEach(en => {
+          if (!en.isIntersecting) return;
+          const el = en.target, to = +el.dataset.to, dur = 1800, t0 = performance.now();
+          const step = t => {
+            const p = Math.min((t - t0) / dur, 1), e = 1 - Math.pow(1 - p, 4);
+            el.textContent = Math.round(to * e);
+            if (p < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+          cio.unobserve(el);
+        });
+      }, { threshold: .6 });
+      document.querySelectorAll('.count').forEach(el => cio.observe(el));
+
+      /* ---------- Nav state + progress bar ---------- */
+      const nav = document.getElementById('nav'), bar = document.getElementById('progress');
+      const onScroll = () => {
+        nav.classList.toggle('scrolled', scrollY > 20);
+        const h = document.documentElement.scrollHeight - innerHeight;
+        bar.style.transform = `scaleX(${h > 0 ? scrollY / h : 0})`;
+      };
+      addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      /* ---------- Mobile menu ---------- */
+      const menuBtn = document.getElementById('menuBtn'), menu = document.getElementById('mobileMenu');
+      const closeMenu = () => { menu.classList.add('hidden'); menuBtn.setAttribute('aria-expanded', 'false'); };
+      menuBtn.addEventListener('click', () => {
+        const open = menu.classList.toggle('hidden') === false;
+        menuBtn.setAttribute('aria-expanded', open);
+      });
+
+      /* ---------- Precise anchor scrolling (offset for fixed nav) ---------- */
+      document.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', e => {
+          const id = link.getAttribute('href').slice(1);
+          if (!id) return;
+          const target = document.getElementById(id);
+          if (!target) return;
+          e.preventDefault();
+          closeMenu();
+          // Reveal destination content immediately so it is visible on arrival
+          target.querySelectorAll('.reveal').forEach(el => { el.classList.add('in'); io.unobserve(el); });
+          const offset = id === 'top' ? 0 : nav.offsetHeight;
+          const y = target.getBoundingClientRect().top + scrollY - offset;
+          scrollTo({ top: id === 'top' ? 0 : y, behavior: reduce ? 'auto' : 'smooth' });
+          history.replaceState(null, '', '#' + id);
+        });
+      });
+
+      /* ---------- Active nav link highlight ---------- */
+      const navLinks = [...document.querySelectorAll('.nav-link')];
+      const sections = navLinks.map(a => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+      const setActive = () => {
+        const line = nav.offsetHeight + innerHeight * .3;
+        let current = null;
+        sections.forEach(s => { if (s.getBoundingClientRect().top <= line) current = s.id; });
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
+      };
+      addEventListener('scroll', setActive, { passive: true });
+      setActive();
+
+      /* ---------- Contact form ---------- */
+      const form = document.getElementById('contactForm'), status = document.getElementById('formStatus'), submitText = document.getElementById('submitText');
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const email = form.email.value.trim();
+        if (!form.name.value.trim() || !form.message.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          status.className = 'text-sm text-center mt-4 min-h-[1.25rem] text-amber-300';
+          status.textContent = 'Please fill in your name, a valid email and a short message.';
+          return;
+        }
+        submitText.textContent = 'Sending…';
+        // Replace this timeout with your real endpoint (e.g. fetch('/api/contact', { method:'POST', body:new FormData(form) }))
+        await new Promise(r => setTimeout(r, 1100));
+        submitText.textContent = 'Message sent ✓';
+        status.className = 'text-sm text-center mt-4 min-h-[1.25rem] text-emerald-300';
+        status.textContent = 'Thanks! We’ll be in touch within 24 hours.';
+        form.reset();
+        setTimeout(() => submitText.textContent = 'Send message', 3000);
+      });
+
+      document.getElementById('year').textContent = new Date().getFullYear();
+    })();
+  </script>
+</body>
+</html>
+```
